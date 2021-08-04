@@ -588,7 +588,7 @@ with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as session:
     _x = inf_train_gen().__next__()
     _x_r = session.run(real_data, feed_dict={real_data_conv: _x[:BATCH_SIZE/N_GPUS]})
     _x_r = ((_x_r+1.)*(255.99/2)).astype('int32')
-    lib.save_images.save_images(_x_r.reshape((BATCH_SIZE/N_GPUS, 3, 64, 64)), 'samples_groundtruth.png')
+    lib.save_images.save_images(_x_r.reshape((BATCH_SIZE/N_GPUS, 3, 64, 64)), './samples/gan_64x64/samples_groundtruth.png')
 
 
     # Train loop
@@ -613,8 +613,8 @@ with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as session:
             if MODE == 'wgan':
                 _ = session.run([clip_disc_weights])
 
-        lib.plot.plot('train disc cost', _disc_cost)
-        lib.plot.plot('time', time.time() - start_time)
+        lib.plot.plot('./samples/gan_64x64/train disc cost', _disc_cost)
+        lib.plot.plot('./samples/gan_64x64/time', time.time() - start_time)
 
         if iteration % 200 == 199:
             t = time.time()
@@ -622,7 +622,7 @@ with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as session:
             for (images,) in dev_gen():
                 _dev_disc_cost = session.run(disc_cost, feed_dict={all_real_data_conv: images}) 
                 dev_disc_costs.append(_dev_disc_cost)
-            lib.plot.plot('dev disc cost', np.mean(dev_disc_costs))
+            lib.plot.plot('./samples/gan_64x64/dev disc cost', np.mean(dev_disc_costs))
 
             generate_image(iteration)
 

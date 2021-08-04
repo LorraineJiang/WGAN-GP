@@ -244,7 +244,7 @@ with tf.Session() as session:
             if MODE == 'wgan':
                 _ = session.run([clip_disc_weights])
         # Write logs and save samples
-        lib.plot.plot('disc cost', _disc_cost)
+        lib.plot.plot('./samples/gan_toy/disc cost', _disc_cost)
         if iteration % 100 == 99:
             lib.plot.flush()
             generate_image(_data)

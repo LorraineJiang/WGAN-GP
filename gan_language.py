@@ -166,8 +166,8 @@ with tf.Session() as session:
                 feed_dict={real_inputs_discrete:_data}
             )
 
-        lib.plot.plot('time', time.time() - start_time)
-        lib.plot.plot('train disc cost', _disc_cost)
+        lib.plot.plot('./samples/gan_laguage/time', time.time() - start_time)
+        lib.plot.plot('./samples/gan_laguage/train disc cost', _disc_cost)
 
         if iteration % 100 == 99:
             samples = []
@@ -176,9 +176,9 @@ with tf.Session() as session:
 
             for i in range(4):
                 lm = language_helpers.NgramLanguageModel(i+1, samples, tokenize=False)
-                lib.plot.plot('js{}'.format(i+1), lm.js_with(true_char_ngram_lms[i]))
+                lib.plot.plot('./samples/gan_laguage/js{}'.format(i+1), lm.js_with(true_char_ngram_lms[i]))
 
-            with open('samples_{}.txt'.format(iteration), 'w') as f:
+            with open('./samples/gan_laguage/samples_{}.txt'.format(iteration), 'w') as f:
                 for s in samples:
                     s = "".join(s)
                     f.write(s + "\n")

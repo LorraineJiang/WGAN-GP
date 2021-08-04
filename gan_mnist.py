@@ -195,7 +195,7 @@ def generate_image(frame, true_dist):
     samples = session.run(fixed_noise_samples)
     lib.save_images.save_images(
         samples.reshape((128, 28, 28)), 
-        'samples_{}.png'.format(frame)
+        './samples/gan_mnist/samples_{}.png'.format(frame)
     )
 
 # Dataset iterator
@@ -231,8 +231,8 @@ with tf.Session() as session:
             if clip_disc_weights is not None:
                 _ = session.run(clip_disc_weights)
 
-        lib.plot.plot('train disc cost', _disc_cost)
-        lib.plot.plot('time', time.time() - start_time)
+        lib.plot.plot('./samples/gan_mnist/train disc cost', _disc_cost)
+        lib.plot.plot('./samples/gan_mnist/time', time.time() - start_time)
 
         # Calculate dev loss and generate samples every 100 iters
         if iteration % 100 == 99:
@@ -243,7 +243,7 @@ with tf.Session() as session:
                     feed_dict={real_data: images}
                 )
                 dev_disc_costs.append(_dev_disc_cost)
-            lib.plot.plot('dev disc cost', np.mean(dev_disc_costs))
+            lib.plot.plot('./samples/gan_mnist/dev disc cost', np.mean(dev_disc_costs))
 
             generate_image(iteration, _data)
 

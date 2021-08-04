@@ -318,7 +318,7 @@ with tf.Session() as session:
     def generate_image(frame, true_dist):
         samples = session.run(fixed_noise_samples)
         samples = ((samples+1.)*(255./2)).astype('int32')
-        lib.save_images.save_images(samples.reshape((100, 3, 32, 32)), 'samples_{}.png'.format(frame))
+        lib.save_images.save_images(samples.reshape((100, 3, 32, 32)), './samples/gan_cifar_resnet/samples_{}.png'.format(frame))
 
     # Function for calculating inception score
     fake_labels_100 = tf.cast(tf.random_uniform([100])*10, tf.int32)
@@ -376,18 +376,18 @@ with tf.Session() as session:
             else:
                 _disc_cost, _ = session.run([disc_cost, disc_train_op], feed_dict={all_real_data_int: _data, all_real_labels:_labels, _iteration:iteration})
 
-        lib.plot.plot('cost', _disc_cost)
+        lib.plot.plot('./samples/gan_cifar_resnet/cost', _disc_cost)
         if CONDITIONAL and ACGAN:
-            lib.plot.plot('wgan', _disc_wgan)
-            lib.plot.plot('acgan', _disc_acgan)
-            lib.plot.plot('acc_real', _disc_acgan_acc)
-            lib.plot.plot('acc_fake', _disc_acgan_fake_acc)
-        lib.plot.plot('time', time.time() - start_time)
+            lib.plot.plot('./samples/gan_cifar_resnet/wgan', _disc_wgan)
+            lib.plot.plot('./samples/gan_cifar_resnet/acgan', _disc_acgan)
+            lib.plot.plot('./samples/gan_cifar_resnet/acc_real', _disc_acgan_acc)
+            lib.plot.plot('./samples/gan_cifar_resnet/acc_fake', _disc_acgan_fake_acc)
+        lib.plot.plot('./samples/gan_cifar_resnet/time', time.time() - start_time)
 
         if iteration % INCEPTION_FREQUENCY == INCEPTION_FREQUENCY-1:
             inception_score = get_inception_score(50000)
-            lib.plot.plot('inception_50k', inception_score[0])
-            lib.plot.plot('inception_50k_std', inception_score[1])
+            lib.plot.plot('./samples/gan_cifar_resnet/inception_50k', inception_score[0])
+            lib.plot.plot('./samples/gan_cifar_resnet/inception_50k_std', inception_score[1])
 
         # Calculate dev loss and generate samples every 100 iters
         if iteration % 100 == 99:
@@ -395,7 +395,7 @@ with tf.Session() as session:
             for images,_labels in dev_gen():
                 _dev_disc_cost = session.run([disc_cost], feed_dict={all_real_data_int: images,all_real_labels:_labels})
                 dev_disc_costs.append(_dev_disc_cost)
-            lib.plot.plot('dev_cost', np.mean(dev_disc_costs))
+            lib.plot.plot('./samples/gan_cifar_resnet/dev_cost', np.mean(dev_disc_costs))
 
             generate_image(iteration, _data)
 

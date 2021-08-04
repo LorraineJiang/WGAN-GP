@@ -155,7 +155,7 @@ fixed_noise_samples_128 = Generator(128, noise=fixed_noise_128)
 def generate_image(frame, true_dist):
     samples = session.run(fixed_noise_samples_128)
     samples = ((samples+1.)*(255./2)).astype('int32')
-    lib.save_images.save_images(samples.reshape((128, 3, 32, 32)), 'samples_{}.jpg'.format(frame))
+    lib.save_images.save_images(samples.reshape((128, 3, 32, 32)), './samples/gan_cifar/samples_{}.jpg'.format(frame))
 
 # For calculating inception score
 samples_100 = Generator(100)
@@ -196,13 +196,13 @@ with tf.Session() as session:
             if MODE == 'wgan':
                 _ = session.run(clip_disc_weights)
 
-        lib.plot.plot('train disc cost', _disc_cost)
-        lib.plot.plot('time', time.time() - start_time)
+        lib.plot.plot('./samples/gan_cifar/train disc cost', _disc_cost)
+        lib.plot.plot('./samples/gan_cifar/time', time.time() - start_time)
 
         # Calculate inception score every 1K iters
         if iteration % 1000 == 999:
             inception_score = get_inception_score()
-            lib.plot.plot('inception score', inception_score[0])
+            lib.plot.plot('./samples/gan_cifar/inception score', inception_score[0])
 
         # Calculate dev loss and generate samples every 100 iters
         if iteration % 100 == 99:
@@ -210,7 +210,7 @@ with tf.Session() as session:
             for images,_ in dev_gen():
                 _dev_disc_cost = session.run(disc_cost, feed_dict={real_data_int: images}) 
                 dev_disc_costs.append(_dev_disc_cost)
-            lib.plot.plot('dev disc cost', np.mean(dev_disc_costs))
+            lib.plot.plot('./samples/gan_cifar/dev disc cost', np.mean(dev_disc_costs))
             generate_image(iteration, _data)
 
         # Save logs every 100 iters
