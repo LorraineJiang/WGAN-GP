@@ -1,1 +1,4 @@
 dataset/
+/tflib/__pycache__/
+/tflib/ops/__pycache__/
+samples/
