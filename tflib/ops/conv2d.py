@@ -19,10 +19,10 @@ def unset_weights_stdev():
 
 def Conv2D(name, input_dim, output_dim, filter_size, inputs, he_init=True, mask_type=None, stride=1, weightnorm=None, biases=True, gain=1.):
     """
-    inputs: tensor of shape (batch size, num channels, height, width)
+    inputs: tensor of shape (batch size, height, width, num channels)
     mask_type: one of None, 'a', 'b'
 
-    returns: tensor of shape (batch size, num channels, height, width)
+    returns: tensor of shape (batch size, height, width, num channels)
     """
     with tf.name_scope(name) as scope:
 
@@ -106,9 +106,9 @@ def Conv2D(name, input_dim, output_dim, filter_size, inputs, he_init=True, mask_
         result = tf.nn.conv2d(
             input=inputs, 
             filter=filters, 
-            strides=[1, 1, stride, stride],
+            strides=[1, stride, stride, 1],
             padding='SAME',
-            data_format='NCHW'
+            data_format='NHWC'
         )
 
         if biases:
@@ -117,7 +117,7 @@ def Conv2D(name, input_dim, output_dim, filter_size, inputs, he_init=True, mask_
                 np.zeros(output_dim, dtype='float32')
             )
 
-            result = tf.nn.bias_add(result, _biases, data_format='NCHW')
+            result = tf.nn.bias_add(result, _biases, data_format='NHWC')
 
 
         return result

@@ -19,7 +19,7 @@ import tflib.plot
 # Download CIFAR-10 (Python version) at
 # https://www.cs.toronto.edu/~kriz/cifar.html and fill in the path to the
 # extracted files here!
-DATA_DIR = ''
+DATA_DIR = './dataset/cifar10'
 if len(DATA_DIR) == 0:
     raise Exception('Please specify path to data directory in gan_cifar.py!')
 
@@ -69,6 +69,7 @@ def Generator(n_samples, noise=None):
 
 def Discriminator(inputs):
     output = tf.reshape(inputs, [-1, 3, 32, 32])
+    output = tf.transpose(output, perm=[0, 2, 3, 1])        # 将NCHW转为NHWC
 
     output = lib.ops.conv2d.Conv2D('Discriminator.1', 3, DIM, 5, output, stride=2)
     output = LeakyReLU(output)
@@ -155,7 +156,7 @@ fixed_noise_samples_128 = Generator(128, noise=fixed_noise_128)
 def generate_image(frame, true_dist):
     samples = session.run(fixed_noise_samples_128)
     samples = ((samples+1.)*(255./2)).astype('int32')
-    lib.save_images.save_images(samples.reshape((128, 3, 32, 32)), './samples/gan_cifar/samples_{}.jpg'.format(frame))
+    lib.save_images.save_images(samples.reshape((128, 3, 32, 32)), './samples/cifar10/samples_{}.jpg'.format(frame))
 
 # For calculating inception score
 samples_100 = Generator(100)
@@ -177,7 +178,7 @@ def inf_train_gen():
 
 # Train loop
 with tf.Session() as session:
-    session.run(tf.initialize_all_variables())
+    session.run(tf.global_variables_initializer())
     gen = inf_train_gen()
 
     for iteration in range(ITERS):
@@ -196,13 +197,13 @@ with tf.Session() as session:
             if MODE == 'wgan':
                 _ = session.run(clip_disc_weights)
 
-        lib.plot.plot('./samples/gan_cifar/train disc cost', _disc_cost)
-        lib.plot.plot('./samples/gan_cifar/time', time.time() - start_time)
+        lib.plot.plot('./samples/cifar10/train disc cost', _disc_cost)
+        lib.plot.plot('./samples/cifar10/time', time.time() - start_time)
 
         # Calculate inception score every 1K iters
         if iteration % 1000 == 999:
             inception_score = get_inception_score()
-            lib.plot.plot('./samples/gan_cifar/inception score', inception_score[0])
+            lib.plot.plot('./samples/cifar10/inception score', inception_score[0])
 
         # Calculate dev loss and generate samples every 100 iters
         if iteration % 100 == 99:
@@ -210,7 +211,7 @@ with tf.Session() as session:
             for images,_ in dev_gen():
                 _dev_disc_cost = session.run(disc_cost, feed_dict={real_data_int: images}) 
                 dev_disc_costs.append(_dev_disc_cost)
-            lib.plot.plot('./samples/gan_cifar/dev disc cost', np.mean(dev_disc_costs))
+            lib.plot.plot('./samples/cifar10/dev disc cost', np.mean(dev_disc_costs))
             generate_image(iteration, _data)
 
         # Save logs every 100 iters
